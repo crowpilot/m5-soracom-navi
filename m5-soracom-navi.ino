@@ -12,11 +12,14 @@
 #include<LovyanGFX.hpp>
 
 #include "Geo.h"
+#include "Http.h"
 
 
 
 TinyGsm modem(Serial2); /* 3G board modem */
 TinyGsmClientSecure ctx(modem);
+Http http(ctx);
+
 
 File f;
 
@@ -35,10 +38,12 @@ int year, month, day, hour, minute, second;
 int mcc, mnc;
 long lac, cellid;
 
+
 void setup() {
   M5.begin();
   SD.begin();
   lcd.init();
+  
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   //  lcd.setRotation(1);
@@ -76,6 +81,12 @@ void setup() {
 
 
 void loop() {
+  Geo test=Geo(34,132,14);
+  http.getMap(test.path(),test.filename());
+  lcd.drawPngFile(SD, test.filename().c_str(), 0, 0);
+  while (1){
+    delay(10000);
+  }
   //M5.update();
   f = SD.open("/apikey.txt");
   String apikey;
@@ -172,20 +183,13 @@ void loop() {
   lcd.setCursor(0, 0);
   lcd.setTextSize(2);
   lcd.printf("%3.3f%3.3f\n", lat, lon);
-  x = pow(2, 13) * (180 + lon) / 180;
-  y = pow(2, 13) * (1 - log(tan(lat * 3.14 / 180) + 1 / cos(lat * 3.14 / 180)) / 3.14);
-  String openfile = "/" + String(zoom) + "-" + String(x) + "-" + String(y) + ".png";
+
   Geo main=Geo(lat,lon,zoom);
   Serial.println(main.filename());
   if (SD.exists(main.filename())) {
     Serial.println("file exists");
   } else {
 
-    path = String("GET /xyz/std/");
-    path += String(zoom) + "/";
-    path += String(int(x)) + "/";
-    path += String(int(y)) + ".png";
-    path += " HTTP/1.0";
     Serial.println(main.path().c_str());
 
     //M5.M5.Lcd.printf("XYZ=%d,%d/14",int(pow(2,13)*(180+lon)/180),int(pow(2,13)*(1-log(tan(lat*3.14/180)+1/cos(lat*3.14/180))/3.14)));
@@ -237,8 +241,8 @@ void loop() {
   lcd.clear();
 
 
-  Serial.println(openfile);
-  lcd.drawPngFile(SD, openfile.c_str(), 0, 0);
+  Serial.println(main.filename());
+  lcd.drawPngFile(SD, main.filename().c_str(), 0, 0);
   //   _buf[0] = '\0';
   Serial.println("done");
   while (1) {

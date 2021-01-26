@@ -15,6 +15,7 @@ String Geo::filename(){
   return "/"+String(_zoom)+"-"+String(_tileX)+"-"+String(_tileY)+".png";
 }
 
+
 String Geo::path(){
   return "GET /xyz/std/"+String(_zoom)+"/"+String(int(_tileX)) + "/"+String(int(_tileY)) + ".png"+" HTTP/1.1";
 }
