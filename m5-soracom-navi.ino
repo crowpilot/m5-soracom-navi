@@ -81,12 +81,6 @@ void setup() {
 
 
 void loop() {
-  Geo test=Geo(34,132,14);
-  http.getMap(test.path(),test.filename());
-  lcd.drawPngFile(SD, test.filename().c_str(), 0, 0);
-  while (1){
-    delay(10000);
-  }
   //M5.update();
   f = SD.open("/apikey.txt");
   String apikey;
@@ -177,65 +171,18 @@ void loop() {
 
   Serial.printf("%f,%f  speed=%f\n accuracy=", lat, lon, speed);
   Serial.println(accuracy);
-
-  
-
   lcd.setCursor(0, 0);
   lcd.setTextSize(2);
   lcd.printf("%3.3f%3.3f\n", lat, lon);
-
+  
   Geo main=Geo(lat,lon,zoom);
+
   Serial.println(main.filename());
   if (SD.exists(main.filename())) {
     Serial.println("file exists");
   } else {
-
     Serial.println(main.path().c_str());
-
-    //M5.M5.Lcd.printf("XYZ=%d,%d/14",int(pow(2,13)*(180+lon)/180),int(pow(2,13)*(1-log(tan(lat*3.14/180)+1/cos(lat*3.14/180))/3.14)));
-
-    if (!ctx.connect("cyberjapandata.gsi.go.jp", 443)) {
-      Serial.println(F("Connect failed."));
-      return;
-    }
-    Serial.println("connected");
-
-    ctx.println(main.path());
-    ctx.print("Host: ");
-    ctx.println(host);
-    ctx.println();
-    //ctx.print("Connection: close\r\n\r\n");
-    Serial.println("sent");
-
-    while (ctx.connected()) {
-      String line = ctx.readStringUntil('\n');
-      Serial.println(line);
-      if (line == "\r") {
-        Serial.println("header ok");
-        break;
-      }
-    }
-    Serial.println("body");
-
-    //   ctx.readBytes(_buf, sizeof(_buf));
-
-    uint32_t readLen = 0;
-    //String openfile = "/" + String(zoom) + "-" + String(x) + "-" + String(y) + ".png";
-    f = SD.open(main.filename(), FILE_APPEND);
-    while (ctx.connected()) {
-      char c = ctx.read();
-      Serial.print(c);
-      f.print(c);
-    }
-    //f.write((const unsigned char *)_buf,strlen(_buf));
-    f.close();
-    Serial.println("f close");
-
-    //ctx.readBytes(_buf, sizeof(_buf)); /* body */
-
-    ctx.stop();
-
-    Serial.println("stop ");
+    http.getMap(main.path(),main.filename());
   }
 
   lcd.clear();
