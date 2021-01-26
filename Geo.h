@@ -5,18 +5,17 @@
 
 class Geo{
   public:
-  Geo();
+  Geo(float lat,float lon,int zoom=14);
   void setLocation(float lat,float lon,int zoom=14);
   
   String filename();
-  String surroundTilename(int x,int y);
 
   String path();
-  String surroundPath();
 
-  int mainTileX;
-  int mainTileY;
+  
   private:
+  int _tileX;
+  int _tileY;
   float _lat;
   float _lon;
   int _zoom;

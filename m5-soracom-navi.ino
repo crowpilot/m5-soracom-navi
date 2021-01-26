@@ -5,12 +5,15 @@
 #include <TinyGsmClient.h>
 #include<string.h>
 #include<ArduinoJson.h>
+#include <math.h>
 
 #include<SD.h>
 
 #include<LovyanGFX.hpp>
 
-#include <math.h>
+#include "Geo.h"
+
+
 
 TinyGsm modem(Serial2); /* 3G board modem */
 TinyGsmClientSecure ctx(modem);
@@ -172,8 +175,9 @@ void loop() {
   x = pow(2, 13) * (180 + lon) / 180;
   y = pow(2, 13) * (1 - log(tan(lat * 3.14 / 180) + 1 / cos(lat * 3.14 / 180)) / 3.14);
   String openfile = "/" + String(zoom) + "-" + String(x) + "-" + String(y) + ".png";
-
-  if (SD.exists(openfile)) {
+  Geo main=Geo(lat,lon,zoom);
+  Serial.println(main.filename());
+  if (SD.exists(main.filename())) {
     Serial.println("file exists");
   } else {
 
@@ -182,7 +186,7 @@ void loop() {
     path += String(int(x)) + "/";
     path += String(int(y)) + ".png";
     path += " HTTP/1.0";
-    Serial.println(path.c_str());
+    Serial.println(main.path().c_str());
 
     //M5.M5.Lcd.printf("XYZ=%d,%d/14",int(pow(2,13)*(180+lon)/180),int(pow(2,13)*(1-log(tan(lat*3.14/180)+1/cos(lat*3.14/180))/3.14)));
 
@@ -192,7 +196,7 @@ void loop() {
     }
     Serial.println("connected");
 
-    ctx.println(path);
+    ctx.println(main.path());
     ctx.print("Host: ");
     ctx.println(host);
     ctx.println();
@@ -213,7 +217,7 @@ void loop() {
 
     uint32_t readLen = 0;
     //String openfile = "/" + String(zoom) + "-" + String(x) + "-" + String(y) + ".png";
-    f = SD.open(openfile, FILE_APPEND);
+    f = SD.open(main.filename(), FILE_APPEND);
     while (ctx.connected()) {
       char c = ctx.read();
       Serial.print(c);
