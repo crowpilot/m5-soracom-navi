@@ -209,6 +209,9 @@ void loop() {
     }
   }
   //   _buf[0] = '\0';
+  lcd.drawCircle(160,120,10,TFT_RED);
+  lcd.drawCircle(160,120,9,TFT_RED);
+  lcd.drawCircle(160,120,8,TFT_RED);
   Serial.println("done");
   while (1) {
     delay(1000 * 600);
