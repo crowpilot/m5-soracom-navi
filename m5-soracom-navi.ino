@@ -43,6 +43,7 @@ void setup() {
   M5.begin();
   SD.begin();
   lcd.init();
+  sprite.setColorDepth(8);
 
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -199,7 +200,10 @@ void loop() {
     for(int y=-1;y<=1;y++){
       if(0<(main.offsetX()+256*(x+1)) or (main.offsetX()+256*x)<320){
         if(0<(main.offsetY()+256*(y+1))or (main.offsetY()+256*y)<240){
-          lcd.drawPngFile(SD, main.filename(x,y).c_str(), main.offsetX(x), main.offsetY(y));
+          sprite.createSprite(256,256);
+          sprite.drawPngFile(SD, main.filename(x,y).c_str(), 0, 0);
+          sprite.pushSprite(main.offsetX(x),main.offsetY(y));
+          //lcd.drawPngFile(SD, main.filename(x,y).c_str(), main.offsetX(x), main.offsetY(y));
         }
       }
     }
