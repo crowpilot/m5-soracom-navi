@@ -8,14 +8,21 @@ class Geo{
   Geo(float lat,float lon,int zoom=14);
   void setLocation(float lat,float lon,int zoom=14);
   
-  String filename();
+  String filename(int x=0,int y=0);
 
-  String path();
+  String path(int x=0,int y=0);
 
+  int offsetX(int x=0);
+  int offsetY(int y=0);
+  
   
   private:
+  float _tileXraw;
+  float _tileYraw;
   int _tileX;
   int _tileY;
+  int _offsetX;
+  int _offsetY;
   float _lat;
   float _lon;
   int _zoom;

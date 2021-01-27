@@ -12,9 +12,13 @@ bool Http::init(TinyGsmClientSecure* ctx) {
 }
 
 bool Http::getMap(String path, String filename) {
+  if(SD.exists(filename)){
+    return 1;
+  }
+
+  Serial.println("Download");
   if (!c->connect("cyberjapandata.gsi.go.jp", 443)) {
     Serial.println(F("Connect failed."));
-    Serial.println("connected");
     return 0;
   }
 
@@ -43,9 +47,8 @@ bool Http::getMap(String path, String filename) {
   }
   //f.write((const unsigned char *)_buf,strlen(_buf));
   f.close();
-  Serial.println("f close");
   c->stop();
-
+ Serial.println("f close HTTP stop");
   return 1;
 }
 

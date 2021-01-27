@@ -43,7 +43,7 @@ void setup() {
   M5.begin();
   SD.begin();
   lcd.init();
-  
+
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   //  lcd.setRotation(1);
@@ -140,7 +140,7 @@ void loop() {
   String locBody;
   ctx.readStringUntil('\n');
   while (ctx.connected()) {
-    String line=ctx.readStringUntil('\n');
+    String line = ctx.readStringUntil('\n');
     Serial.print(line);
     locBody += line;
     if (line == "\r") {
@@ -152,7 +152,7 @@ void loop() {
   ctx.stop();
 
   Serial.println("stop");
-  
+
   const size_t capacity2 = 2 * JSON_OBJECT_SIZE(2) + 30;
   DynamicJsonDocument doc2(capacity2);
   deserializeJson(doc2, locBody);
@@ -164,7 +164,7 @@ void loop() {
   Serial.print(lon);
   //WIFI location
 
-  if(!lat){
+  if (!lat) {
     Serial.println("modem gps");
     modem.getGPS(&lat, &lon, &speed, &alt, &vsat, &usat, &accuracy, &year, &month, &day, &hour, &minute, &second);
   }
@@ -174,22 +174,36 @@ void loop() {
   lcd.setCursor(0, 0);
   lcd.setTextSize(2);
   lcd.printf("%3.3f%3.3f\n", lat, lon);
-  
-  Geo main=Geo(lat,lon,zoom);
+
+  Geo main = Geo(lat, lon, zoom);
 
   Serial.println(main.filename());
-  if (SD.exists(main.filename())) {
-    Serial.println("file exists");
-  } else {
-    Serial.println(main.path().c_str());
-    http.getMap(main.path(),main.filename());
-  }
+  Serial.println(main.path().c_str());
+  //http.getMap(main.path(), main.filename());
 
+  for (int x=-1;x<=1;x++){
+    for(int y=-1;y<=1;y++){
+      if(0<(main.offsetX()+256*(x+1)) or (main.offsetX()+256*x)<320){
+        if(0<(main.offsetY()+256*(y+1))or (main.offsetY()+256*y)<240){
+          http.getMap(main.path(x,y),main.filename(x,y));
+        }
+      }
+    }
+  }
+  
   lcd.clear();
 
-
   Serial.println(main.filename());
-  lcd.drawPngFile(SD, main.filename().c_str(), 0, 0);
+  //lcd.drawPngFile(SD, main.filename().c_str(), main.offsetX(), main.offsetY());
+  for (int x=-1;x<=1;x++){
+    for(int y=-1;y<=1;y++){
+      if(0<(main.offsetX()+256*(x+1)) or (main.offsetX()+256*x)<320){
+        if(0<(main.offsetY()+256*(y+1))or (main.offsetY()+256*y)<240){
+          lcd.drawPngFile(SD, main.filename(x,y).c_str(), main.offsetX(x), main.offsetY(y));
+        }
+      }
+    }
+  }
   //   _buf[0] = '\0';
   Serial.println("done");
   while (1) {
