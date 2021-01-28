@@ -52,14 +52,13 @@ void setup() {
 
   Serial.begin(115200);
 
-
-  lcd.print(F("modem.restart()"));
+  Serial.print(F("modem.restart()"));
   Serial2.begin(115200, SERIAL_8N1, 16, 17);
   modem.restart();
 
-  lcd.print(F("getModemInfo:"));
+  Serial.print(F("getModemInfo:"));
   String modemInfo = modem.getModemInfo();
-  lcd.println(modemInfo);
+  Serial.println(modemInfo);
 
   while (!modem.waitForNetwork()) {
     Serial.print(".");
@@ -71,103 +70,28 @@ void setup() {
     Serial.print(".");
   }
 
-  lcd.println(F("enable GPS"));
-  modem.enableGPS();
+  lcd.println(F("modem done"));
+  
 
   Serial.println(modem.localIP());
 
-  delay(1000);
+  delay(500);
   lcd.clear();
 }
 
 
 void loop() {
   //M5.update();
-  f = SD.open("/apikey.txt");
-  String apikey;
-  while (f.available()) {
-    apikey += char(f.read());
-  }
-  f.close();
-  Serial.println(apikey);
-
-  Serial.print("GPS modem start");
-  //modem.getGPS(&lat, &lon, &speed, &alt, &vsat, &usat, &accuracy, &year, &month, &day, &hour, &minute, &second);
-  lat = 34;
-  lon = 134;
-  //WIFI  geo location
-
-  String json;
-  int n = WiFi.scanNetworks();
-  const size_t capacity = JSON_ARRAY_SIZE(3) + (3) * JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(2) + 34 + (3 * 29);
-  DynamicJsonDocument doc(capacity);
-  doc["considerIp"] = "false";
-  JsonArray wifiAccessPoints = doc.createNestedArray("wifiAccessPoints");
-  for (int i = 0; i < n; i++) {
-    if (i == 3) break;
-    String bssid = WiFi.BSSIDstr(i);
-    JsonObject wifiAP = wifiAccessPoints.createNestedObject();
-    wifiAP["macAddress"] = WiFi.BSSIDstr(i);
-  }
-  serializeJson(doc, json);
-  Serial.println(json);
-
-  if (!ctx.connect("www.googleapis.com", 443)) {
-    Serial.println(F("Connect failed."));
-    return;
-  }
-  Serial.println("google connected");
-  String path = "POST /geolocation/v1/geolocate?key=" + apikey + " HTTP/1.1";
-  ctx.println(path);
-  ctx.print("Host: ");
-  ctx.println("www.googleapis.com");
-  ctx.println("Content-Type: application/json");
-  ctx.print("Content-Length: ");
-  ctx.println(json.length());
-  ctx.println();
-  ctx.println(json.c_str());
-  //ctx.print("Connection: close\r\n\r\n");
-  Serial.println("sent");
-
-  while (ctx.connected()) {
-    String line = ctx.readStringUntil('\n');
-    Serial.println(line);
-    if (line == "\r") {
-      Serial.println("header ok");
-      break;
-    }
-  }
-  Serial.println("body");
-  String locBody;
-  ctx.readStringUntil('\n');
-  while (ctx.connected()) {
-    String line = ctx.readStringUntil('\n');
-    Serial.print(line);
-    locBody += line;
-    if (line == "\r") {
-      Serial.println("body ok");
-      break;
-    }
-  }
-  //Serial.println(locBody);
-  ctx.stop();
-
-  Serial.println("stop");
-
-  const size_t capacity2 = 2 * JSON_OBJECT_SIZE(2) + 30;
-  DynamicJsonDocument doc2(capacity2);
-  deserializeJson(doc2, locBody);
-  lat = doc2["location"]["lat"];
-  lon = doc2["location"]["lng"];
-  accuracy = doc2["accuracy"];
-
-  Serial.print(lat);
-  Serial.print(lon);
   //WIFI location
+
+  http.getLocation(lat,lon);
 
   if (!lat) {
     Serial.println("modem gps");
+    modem.enableGPS();
     modem.getGPS(&lat, &lon, &speed, &alt, &vsat, &usat, &accuracy, &year, &month, &day, &hour, &minute, &second);
+    zoom=10;
+    
   }
 
   Serial.printf("%f,%f  speed=%f\n accuracy=", lat, lon, speed);
@@ -213,7 +137,26 @@ void loop() {
   lcd.drawCircle(160,120,9,TFT_RED);
   lcd.drawCircle(160,120,8,TFT_RED);
   Serial.println("done");
+  int loadx=-2;
+  int loady=-2;
   while (1) {
-    delay(1000 * 600);
+    M5.update();
+    //download sarani surround tile
+    if(M5.BtnA.wasPressed()){
+      zoom--;
+      break;
+    }
+    if(M5.BtnC.wasPressed()){
+      zoom++;
+      break;
+    }
+    //http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
+    //http.getLocation(lat,lon);
+    lat+=0.005;
+    lon+=0.005;
+    main.setPlot(lat,lon);
+    lcd.drawCircle(main.plotX(),main.plotY(),7,TFT_RED);
+    Serial.println("put");
+    delay(10*1000);
   }
 }

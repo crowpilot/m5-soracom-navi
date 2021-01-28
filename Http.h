@@ -4,9 +4,7 @@
 #include<M5Stack.h>
 #define TINY_GSM_MODEM_UBLOX
 #include <TinyGsmClient.h>
-#include<string.h>
-#include<ArduinoJson.h>
-#include<SD.h>
+#include<Preferences.h>
 
 class Http:public TinyGsmClientSecure {
   public:
@@ -14,10 +12,12 @@ class Http:public TinyGsmClientSecure {
   explicit Http(TinyGsmClientSecure& ctx);
   bool init(TinyGsmClientSecure* ctx);
   bool getMap(String path,String filename);
+  bool getLocation(float &lat,float &lon);
   private:
   bool getHeader();
   TinyGsmClientSecure* c;
   File f;
+  Preferences _prefs;
 };
 
 #endif

@@ -14,6 +14,10 @@ class Geo{
 
   int offsetX(int x=0);
   int offsetY(int y=0);
+  int plotX();
+  int plotY();
+
+  void setPlot(float lat,float lon);
   
   
   private:
@@ -26,6 +30,8 @@ class Geo{
   float _lat;
   float _lon;
   int _zoom;
+  int _plotX;
+  int _plotY;
   
 };
 
