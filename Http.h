@@ -18,6 +18,7 @@ class Http:public TinyGsmClientSecure {
   TinyGsmClientSecure* c;
   File f;
   Preferences _prefs;
+  String _wifi[3];
 };
 
 #endif

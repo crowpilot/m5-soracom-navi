@@ -62,7 +62,6 @@ bool Http::getLocation(float &lat, float &lon) {
     apikey += char(f.read());
   }
   f.close();
-  Serial.println(apikey);
 
   _prefs.begin("location", true);
   lat = _prefs.getFloat("lat", 34.704);
@@ -76,15 +75,29 @@ bool Http::getLocation(float &lat, float &lon) {
 
   String json;
   int n = WiFi.scanNetworks();
+  if(n==0){
+    Serial.println("no wifi");
+    return 0;
+  }
   const size_t capacity = JSON_ARRAY_SIZE(3) + (3) * JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(2) + 34 + (3 * 29);
   DynamicJsonDocument doc(capacity);
   doc["considerIp"] = "false";
   JsonArray wifiAccessPoints = doc.createNestedArray("wifiAccessPoints");
+
+  int breakflg=0;
   for (int i = 0; i < n; i++) {
     if (i == 3) break;
     String bssid = WiFi.BSSIDstr(i);
     JsonObject wifiAP = wifiAccessPoints.createNestedObject();
-    wifiAP["macAddress"] = WiFi.BSSIDstr(i);
+    wifiAP["macAddress"] = bssid;
+    if(_wifi[i].equals(bssid)){
+      breakflg++;
+    }
+    _wifi[i]=bssid;
+  }
+  if(breakflg==3){
+    Serial.println("same wifi BSSID");
+    return 0;
   }
   serializeJson(doc, json);
   Serial.println(json);

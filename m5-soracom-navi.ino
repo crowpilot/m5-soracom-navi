@@ -150,13 +150,17 @@ void loop() {
       zoom++;
       break;
     }
-    //http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
-    //http.getLocation(lat,lon);
-    lat+=0.005;
-    lon+=0.005;
+    http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
+    http.getLocation(lat,lon);
     main.setPlot(lat,lon);
     lcd.drawCircle(main.plotX(),main.plotY(),7,TFT_RED);
+    if(main.plotX()<20 or main.plotX()>300){
+      break;
+    }
+    if(main.plotY()<20 or main.plotY()>220){
+      break;
+    }
     Serial.println("put");
-    delay(10*1000);
+    delay(60*1000);
   }
 }
