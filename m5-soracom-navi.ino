@@ -154,13 +154,23 @@ void loop() {
     http.getLocation(lat,lon);
     main.setPlot(lat,lon);
     lcd.drawCircle(main.plotX(),main.plotY(),7,TFT_RED);
-    if(main.plotX()<20 or main.plotX()>300){
+    if(main.plotX()<40 or main.plotX()>280){
       break;
     }
-    if(main.plotY()<20 or main.plotY()>220){
+    if(main.plotY()<40 or main.plotY()>200){
       break;
     }
     Serial.println("put");
-    delay(60*1000);
+    delay(30*1000);
+    http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
+    Serial.printf("load tile %d,%d",loadx,loady);
+    loadx++;
+    if(loadx==2){
+      loady++;
+      loadx=-2;
+    }
+    if(loady==2){
+      loadx=2;
+    }
   }
 }

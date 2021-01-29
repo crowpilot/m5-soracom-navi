@@ -75,7 +75,7 @@ bool Http::getLocation(float &lat, float &lon) {
 
   String json;
   int n = WiFi.scanNetworks();
-  if(n==0){
+  if (n == 0) {
     Serial.println("no wifi");
     return 0;
   }
@@ -84,18 +84,18 @@ bool Http::getLocation(float &lat, float &lon) {
   doc["considerIp"] = "false";
   JsonArray wifiAccessPoints = doc.createNestedArray("wifiAccessPoints");
 
-  int breakflg=0;
+  int breakflg = 0;
   for (int i = 0; i < n; i++) {
     if (i == 3) break;
     String bssid = WiFi.BSSIDstr(i);
     JsonObject wifiAP = wifiAccessPoints.createNestedObject();
     wifiAP["macAddress"] = bssid;
-    if(_wifi[i].equals(bssid)){
+    if (_wifi[i].equals(bssid)) {
       breakflg++;
     }
-    _wifi[i]=bssid;
+    _wifi[i] = bssid;
   }
-  if(breakflg==3){
+  if (breakflg == 3) {
     Serial.println("same wifi BSSID");
     return 0;
   }
@@ -147,13 +147,16 @@ bool Http::getLocation(float &lat, float &lon) {
   const size_t capacity2 = 2 * JSON_OBJECT_SIZE(2) + 30;
   DynamicJsonDocument doc2(capacity2);
   deserializeJson(doc2, locBody);
+  if (doc2["location"]["lat"]) {
+    Serial.println("wifi get location");
+    lat = doc2["location"]["lat"];
+    lon = doc2["location"]["lng"];
 
-  lat = doc2["location"]["lat"];
-  lon = doc2["location"]["lng"];
-  _prefs.begin("location", false);
-  _prefs.putFloat("lat", lat);
-  _prefs.putFloat("lon", lon);
-  _prefs.end();
+    _prefs.begin("location", false);
+    _prefs.putFloat("lat", lat);
+    _prefs.putFloat("lon", lon);
+    _prefs.end();
+  }
   Serial.println("put Preferenses");
 
   Serial.print(lat);
