@@ -39,7 +39,7 @@ int Geo::offsetY(int y){
 
 void Geo::setPlot(float lat,float lon){
    float posXraw = pow(2, _zoom-1) * (180 + lon) / 180;
-   float posYraw=pow(2, _zoom-1) * (1 - log(tan(_lat * 3.14 / 180) + 1 / cos(_lat * 3.14 / 180)) / 3.14);
+   float posYraw=pow(2, _zoom-1) * (1 - log(tan(lat * 3.14 / 180) + 1 / cos(lat * 3.14 / 180)) / 3.14);
 
    float diffXraw = posXraw-_tileXraw;
    float diffYraw = posYraw-_tileYraw;

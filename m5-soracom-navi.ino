@@ -150,7 +150,7 @@ void loop() {
       zoom++;
       break;
     }
-    http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
+    //http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
     http.getLocation(lat,lon);
     main.setPlot(lat,lon);
     lcd.drawCircle(main.plotX(),main.plotY(),7,TFT_RED);
@@ -160,9 +160,14 @@ void loop() {
     if(main.plotY()<40 or main.plotY()>200){
       break;
     }
-    Serial.println("put");
+    Serial.println("wait 30 sec");
     delay(30*1000);
-    http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
+    if(http.getMap(main.path(loadx,loady),main.filename(loadx,loady))){
+      Serial.println("download surround map");
+    }else{
+      Serial.println("wait 30");
+      delay(30*1000);
+    }
     Serial.printf("load tile %d,%d",loadx,loady);
     loadx++;
     if(loadx==2){
