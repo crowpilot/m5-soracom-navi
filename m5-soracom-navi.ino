@@ -67,7 +67,7 @@ void setup() {
 
   lcd.println("gprs connect");
   modem.gprsConnect("soracom.io", "sora", "sora");
-  
+
   lcd.println("is network connected");
   while (!modem.isNetworkConnected()) {
     lcd.print(".");
@@ -75,10 +75,8 @@ void setup() {
 
   lcd.println(F("modem done"));
 
-
   lcd.println(modem.localIP());
 
-  delay(500);
   lcd.clear();
 }
 
@@ -143,18 +141,9 @@ void loop() {
   int loadx = -2;
   int loady = -2;
   while (1) {
-    M5.update();
-    //download sarani surround tile
-    if (M5.BtnA.wasPressed()) {
-      zoom--;
-      break;
-    }
-    if (M5.BtnC.wasPressed()) {
-      zoom++;
-      break;
-    }
+    //download section
     //http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
-    http.getLocation(lat, lon);
+    //http.getLocation(lat, lon);
     main.setPlot(lat, lon);
     lcd.drawCircle(main.plotX(), main.plotY(), 7, TFT_RED);
     if (main.plotX()<40 or main.plotX()>280) {
@@ -163,24 +152,35 @@ void loop() {
     if (main.plotY()<40 or main.plotY()>200) {
       break;
     }
-    Serial.println("wait 30 sec");
-    delay(30 * 1000);
-    if (loady < 2) {
+    if (loady <= 2) {
       if (http.getMap(main.path(loadx, loady), main.filename(loadx, loady))) {
-        Serial.println("download surround map");
-      } else {
-        Serial.println("wait 30 no download");
-        delay(30 * 1000);
+        Serial.printf("load tile %d,%d\n", loadx, loady);
       }
-      Serial.printf("load tile %d,%d", loadx, loady);
+
       loadx++;
-      if (loadx == 2) {
+      if (loadx > 2) {
         loady++;
         loadx = -2;
       }
-    }else{
+    } else {
       Serial.println("surround map ended");
-      delay(30*1000);
+      break;
     }
+  }
+  while (1) {
+    //zoom section
+    M5.update();
+    //download sarani surround tile
+    if (M5.BtnA.wasPressed()) {
+      Serial.println("zoom -");
+      zoom--;
+      break;
+    }
+    if (M5.BtnC.wasPressed()) {
+      Serial.println("zoom +");
+      zoom++;
+      break;
+    }
+    delay(1);
   }
 }
