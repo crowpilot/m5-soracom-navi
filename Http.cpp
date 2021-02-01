@@ -121,7 +121,7 @@ bool Http::getLocation(float &lat, float &lon) {
 
   while (c->connected()) {
     String line = c->readStringUntil('\n');
-    //Serial.println(line);
+    Serial.println(line);
     if (line == "\r") {
       Serial.println("header ok");
       break;

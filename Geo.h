@@ -17,6 +17,8 @@ class Geo{
   int plotX();
   int plotY();
 
+  void setZoom(int zoom);
+
   void setPlot(float lat,float lon);
   
   

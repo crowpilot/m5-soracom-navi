@@ -52,28 +52,31 @@ void setup() {
 
   Serial.begin(115200);
 
-  Serial.print(F("modem.restart()"));
+  lcd.println(F("modem.restart()"));
   Serial2.begin(115200, SERIAL_8N1, 16, 17);
   modem.restart();
 
-  Serial.print(F("getModemInfo:"));
+  lcd.print(F("getModemInfo:"));
   String modemInfo = modem.getModemInfo();
-  Serial.println(modemInfo);
+  lcd.println(modemInfo);
 
+  lcd.println("wait for network()");
   while (!modem.waitForNetwork()) {
-    Serial.print(".");
+    lcd.print(".");
   }
 
+  lcd.println("gprs connect");
   modem.gprsConnect("soracom.io", "sora", "sora");
-
+  
+  lcd.println("is network connected");
   while (!modem.isNetworkConnected()) {
-    Serial.print(".");
+    lcd.print(".");
   }
 
   lcd.println(F("modem done"));
 
 
-  Serial.println(modem.localIP());
+  lcd.println(modem.localIP());
 
   delay(500);
   lcd.clear();

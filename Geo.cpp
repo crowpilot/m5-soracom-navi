@@ -37,6 +37,10 @@ int Geo::offsetY(int y){
   return _offsetY+256*y;
 }
 
+void Geo::setZoom(int zoom){
+  _zoom = zoom;
+}
+
 void Geo::setPlot(float lat,float lon){
    float posXraw = pow(2, _zoom-1) * (180 + lon) / 180;
    float posYraw=pow(2, _zoom-1) * (1 - log(tan(lat * 3.14 / 180) + 1 / cos(lat * 3.14 / 180)) / 3.14);
