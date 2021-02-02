@@ -92,8 +92,6 @@ void setup() {
   //start tasks
   xTaskCreatePinnedToCore(buttonTask,"button",8192,NULL,1,NULL,1);
   //xTaskCreatePinnedToCore(downloadTask,"download",8192,1,NULL,0);
-
-  
 }
 
 
@@ -209,21 +207,17 @@ void locateTask(void* arg){
 }
 
 void buttonTask(void* arg){
+  //Button check Task 0.01 sec interval
   while (1) {
-
-    //zoom section
     M5.update();
-
     //download sarani surround tile
     if (M5.BtnA.wasPressed()) {
       //Serial.println("zoom -");
       zoom--;
-      //break;
     }
     if (M5.BtnC.wasPressed()) {
       //Serial.println("zoom +");
       zoom++;
-      //break;
     }
 
     vTaskDelay(10);
