@@ -90,16 +90,14 @@ void setup() {
   lcd.clear();
 
   //start tasks
-  xTaskCreatePinnedToCore(buttonTask,"button",8192,NULL,1,NULL,1);
+  xTaskCreatePinnedToCore(buttonTask, "button", 8192, NULL, 1, NULL, 1);
   //xTaskCreatePinnedToCore(downloadTask,"download",8192,1,NULL,0);
 }
 
 
 void loop() {
   //loop function download tile & draw map
-  //M5.update();
   //WIFI location
-
   http.getLocation(lat, lon);
 
   if (!lat) {
@@ -107,7 +105,6 @@ void loop() {
     modem.enableGPS();
     modem.getGPS(&lat, &lon, &speed, &alt, &vsat, &usat, &accuracy, &year, &month, &day, &hour, &minute, &second);
     zoom = 10;
-
   }
 
   Serial.printf("%f,%f  speed=%f\n accuracy=", lat, lon, speed);
@@ -138,20 +135,7 @@ void loop() {
 
 
   Serial.println(main.filename());
-  //lcd.drawPngFile(SD, main.filename().c_str(), main.offsetX(), main.offsetY());
-  /*for (int x = -1; x <= 1; x++) {
-    for (int y = -1; y <= 1; y++) {
-      if (0 < (main.offsetX() + 256 * (x + 1)) or (main.offsetX() + 256 * x) < 320) {
-        if (0 < (main.offsetY() + 256 * (y + 1)) or (main.offsetY() + 256 * y) < 240) {
-          sprite.createSprite(256, 256);
-          sprite.drawPngFile(SD, main.filename(x, y).c_str(), 0, 0);
-          sprite.pushSprite(main.offsetX(x), main.offsetY(y));
-          //lcd.drawPngFile(SD, main.filename(x,y).c_str(), main.offsetX(x), main.offsetY(y));
-        }
-      }
-    }
-  }*/
-  //   _buf[0] = '\0';
+
   lcd.drawCircle(160, 120, 10, TFT_RED);
   lcd.drawCircle(160, 120, 9, TFT_RED);
   lcd.drawCircle(160, 120, 8, TFT_RED);
@@ -161,14 +145,16 @@ void loop() {
   int lastZoom = zoom;
   while (1) {
     int breakFlg = 0;
+    int interval = 30000;
     //download section
     main.setPlot(lat, lon);
     lcd.drawCircle(main.plotX(), main.plotY(), 7, TFT_RED);
-    lastZoom=zoom;
+    lastZoom = zoom;
     if (main.plotX()<40 or main.plotX()>280 or main.plotY()<40 or main.plotY()>200) {
       break;
     }
     if (loady <= 2) {
+      interval = 0;
       if (http.getMap(main.path(loadx, loady), main.filename(loadx, loady))) {
         Serial.printf("load tile %d,%d\n", loadx, loady);
       }
@@ -180,36 +166,30 @@ void loop() {
       }
     } else {
       Serial.println("surround map ended");
-      
-      for(int i=0;i<30000;i++){
-        if(lastZoom!=zoom){
-          breakFlg=1;
-          break;
-          
-        }
-        vTaskDelay(1);
-      }
-      
       http.getLocation(lat, lon);
     }
-    if(breakFlg){
+
+    for (int i = 0; i < interval; i++) {
+      if (lastZoom != zoom) {
+        breakFlg=1;
         break;
       }
-
+      vTaskDelay(1);
+    }
+    if(breakFlg){
+      break;
+    }
   }
-
-  
-  
 }
 
-void locateTask(void* arg){
-  while(1){
-    
+void locateTask(void* arg) {
+  while (1) {
+
     vTaskDelay(30000);
   }
 }
 
-void buttonTask(void* arg){
+void buttonTask(void* arg) {
   //Button check Task 0.01 sec interval
   while (1) {
     M5.update();
@@ -227,8 +207,8 @@ void buttonTask(void* arg){
   }
 }
 
-void downloadTask(void* arg){
-  while(1){
+void downloadTask(void* arg) {
+  while (1) {
     vTaskDelay(1);
   }
 }
