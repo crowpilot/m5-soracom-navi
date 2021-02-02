@@ -26,7 +26,7 @@ File f;
 static LGFX lcd;
 static LGFX_Sprite sprite(&lcd);
 
-int zoom = 14;
+volatile int zoom = 14;
 String path;
 String host = "cyberjapandata.gsi.go.jp";
 int x, y;
@@ -37,6 +37,16 @@ int year, month, day, hour, minute, second;
 
 int mcc, mnc;
 long lac, cellid;
+
+//TASK
+//30 sec interval display function include
+void locateTask(void* arg);
+//button check
+void buttonTask(void* arg);
+//download surround tiles
+void downloadTask(void* arg);
+
+SemaphoreHandle_t xMutex = NULL;
 
 
 void setup() {
@@ -78,10 +88,17 @@ void setup() {
   lcd.println(modem.localIP());
 
   lcd.clear();
+
+  //start tasks
+  xTaskCreatePinnedToCore(buttonTask,"button",8192,NULL,1,NULL,1);
+  //xTaskCreatePinnedToCore(downloadTask,"download",8192,1,NULL,0);
+
+  
 }
 
 
 void loop() {
+  //loop function download tile & draw map
   //M5.update();
   //WIFI location
 
@@ -140,16 +157,14 @@ void loop() {
   Serial.println("done");
   int loadx = -2;
   int loady = -2;
+  int lastZoom = zoom;
   while (1) {
+    int breakFlg = 0;
     //download section
-    //http.getMap(main.path(loadx,loady),main.filename(loadx,loady));
-    //http.getLocation(lat, lon);
     main.setPlot(lat, lon);
     lcd.drawCircle(main.plotX(), main.plotY(), 7, TFT_RED);
-    if (main.plotX()<40 or main.plotX()>280) {
-      break;
-    }
-    if (main.plotY()<40 or main.plotY()>200) {
+    lastZoom=zoom;
+    if (main.plotX()<40 or main.plotX()>280 or main.plotY()<40 or main.plotY()>200) {
       break;
     }
     if (loady <= 2) {
@@ -164,23 +179,58 @@ void loop() {
       }
     } else {
       Serial.println("surround map ended");
-      break;
+      
+      for(int i=0;i<30000;i++){
+        if(lastZoom!=zoom){
+          break;
+          breakFlg=1;
+        }
+        vTaskDelay(1);
+      }
+      
+      http.getLocation(lat, lon);
     }
+    if(breakFlg){
+        break;
+      }
+
   }
+
+  
+  
+}
+
+void locateTask(void* arg){
+  while(1){
+    
+    vTaskDelay(30000);
+  }
+}
+
+void buttonTask(void* arg){
   while (1) {
+
     //zoom section
     M5.update();
+
     //download sarani surround tile
     if (M5.BtnA.wasPressed()) {
-      Serial.println("zoom -");
+      //Serial.println("zoom -");
       zoom--;
-      break;
+      //break;
     }
     if (M5.BtnC.wasPressed()) {
-      Serial.println("zoom +");
+      //Serial.println("zoom +");
       zoom++;
-      break;
+      //break;
     }
-    delay(1);
+
+    vTaskDelay(10);
+  }
+}
+
+void downloadTask(void* arg){
+  while(1){
+    vTaskDelay(1);
   }
 }
