@@ -122,21 +122,24 @@ void loop() {
   Serial.println(main.path().c_str());
   //http.getMap(main.path(), main.filename());
 
+  lcd.clear();
   for (int x = -1; x <= 1; x++) {
     for (int y = -1; y <= 1; y++) {
       if (0 < (main.offsetX() + 256 * (x + 1)) or (main.offsetX() + 256 * x) < 320) {
         if (0 < (main.offsetY() + 256 * (y + 1)) or (main.offsetY() + 256 * y) < 240) {
           http.getMap(main.path(x, y), main.filename(x, y));
+          sprite.createSprite(256, 256);
+          sprite.drawPngFile(SD, main.filename(x, y).c_str(), 0, 0);
+          sprite.pushSprite(main.offsetX(x), main.offsetY(y));
         }
       }
     }
   }
 
-  lcd.clear();
 
   Serial.println(main.filename());
   //lcd.drawPngFile(SD, main.filename().c_str(), main.offsetX(), main.offsetY());
-  for (int x = -1; x <= 1; x++) {
+  /*for (int x = -1; x <= 1; x++) {
     for (int y = -1; y <= 1; y++) {
       if (0 < (main.offsetX() + 256 * (x + 1)) or (main.offsetX() + 256 * x) < 320) {
         if (0 < (main.offsetY() + 256 * (y + 1)) or (main.offsetY() + 256 * y) < 240) {
@@ -147,7 +150,7 @@ void loop() {
         }
       }
     }
-  }
+  }*/
   //   _buf[0] = '\0';
   lcd.drawCircle(160, 120, 10, TFT_RED);
   lcd.drawCircle(160, 120, 9, TFT_RED);
