@@ -182,8 +182,9 @@ void loop() {
       
       for(int i=0;i<30000;i++){
         if(lastZoom!=zoom){
-          break;
           breakFlg=1;
+          break;
+          
         }
         vTaskDelay(1);
       }
