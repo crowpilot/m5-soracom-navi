@@ -39,8 +39,6 @@ int mcc, mnc;
 long lac, cellid;
 
 //TASK
-//30 sec interval display function include
-void locateTask(void* arg);
 //button check
 void buttonTask(void* arg);
 //download surround tiles
@@ -62,6 +60,14 @@ void setup() {
 
   Serial.begin(115200);
 
+  lcd.setCursor(0,100);
+  lcd.setTextSize(2);
+  lcd.println("NAVIGATION");
+  lcd.setTextSize(1);
+  lcd.println("chiriin tile");
+  lcd.println("https://maps.gsi.go.jp/development/ichiran.html");
+  
+  lcd.setCursor(0,0);
   lcd.println(F("modem.restart()"));
   Serial2.begin(115200, SERIAL_8N1, 16, 17);
   modem.restart();
@@ -182,12 +188,7 @@ void loop() {
   }
 }
 
-void locateTask(void* arg) {
-  while (1) {
 
-    vTaskDelay(30000);
-  }
-}
 
 void buttonTask(void* arg) {
   //Button check Task 0.01 sec interval
