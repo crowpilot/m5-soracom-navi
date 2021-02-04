@@ -145,6 +145,11 @@ void loop() {
   lcd.drawCircle(160, 120, 10, TFT_RED);
   lcd.drawCircle(160, 120, 9, TFT_RED);
   lcd.drawCircle(160, 120, 8, TFT_RED);
+  lcd.setTextSize(2);
+  lcd.setCursor(68,220);
+  lcd.print("detail");
+  lcd.setCursor(249,220);
+  lcd.print("exp");
   Serial.println("done");
   int loadx = -2;
   int loady = -2;
