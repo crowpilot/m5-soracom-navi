@@ -164,6 +164,8 @@ bool Http::getLocation(float &lat, float &lon) {
   return 1;
 }
 
-bool getHeader() {
+
+bool Http::getHeader() {
+
   return 1;
 }

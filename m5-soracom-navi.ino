@@ -7,18 +7,23 @@
 #include<ArduinoJson.h>
 #include <math.h>
 
+#include<Preferences.h>
+
 #include<SD.h>
 
 #include<LovyanGFX.hpp>
 
 #include "Geo.h"
 #include "Http.h"
+#include "Slack.h"
 
 
 
 TinyGsm modem(Serial2); /* 3G board modem */
 TinyGsmClientSecure ctx(modem);
+TinyGsmClient ctx2(modem);
 Http http(ctx);
+Slack slack(ctx2);
 
 
 File f;
@@ -93,11 +98,22 @@ void setup() {
 
   lcd.println(modem.localIP());
 
+  Preferences prefs;
+
+  prefs.begin("location", true);
+  lat = prefs.getFloat("lat", 34.704);
+  lon = prefs.getFloat("lon", 137.734);
+  prefs.end();
+  
+   slack.postSlack(lat,lon);
+
   lcd.clear();
 
   //start tasks
   xTaskCreatePinnedToCore(buttonTask, "button", 8192, NULL, 1, NULL, 1);
   //xTaskCreatePinnedToCore(downloadTask,"download",8192,1,NULL,0);
+
+ 
 }
 
 
