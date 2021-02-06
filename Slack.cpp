@@ -16,23 +16,23 @@ bool Slack::init(TinyGsmClient* ctx) {
 
 bool Slack::postSlack(float lat,float lon) {
 
-  f = SD.open("/slacktoken.txt");
+  f = SD.open("/soracom.txt");
   // /WEBHOOK URI + token 
   //check api.slack.com Incoming webhooks
-  String token;
+  String soracom;
   while (f.available()) {
-    token += char(f.read());
+    soracom += char(f.read());
   }
   f.close();
 
-  String json="{\"text\":\"test post\"}";
+  String json="{\"text\":\""+String(lat)+","+String(lon)+"\"}";
 
   if (!c->connect("beam.soracom.io", 8888)) {
     Serial.println(F("Connect failed."));
     return 0;
   }
   Serial.println("slack connected");
-  String path = "POST /crowmoto HTTP/1.1";
+  String path = "POST "+soracom +" HTTP/1.1";
   c->println(path);
   c->print("Host: ");
   c->println("beam.soracom.io");

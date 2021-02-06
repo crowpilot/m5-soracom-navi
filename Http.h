@@ -13,7 +13,6 @@ class Http:public TinyGsmClientSecure {
   bool init(TinyGsmClientSecure* ctx);
   bool getMap(String path,String filename);
   bool getLocation(float &lat,float &lon);
-  bool postSlack(float lat,float lon);
   private:
   bool getHeader();
   TinyGsmClientSecure* c;

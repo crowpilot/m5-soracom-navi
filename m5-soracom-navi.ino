@@ -7,6 +7,8 @@
 #include<ArduinoJson.h>
 #include <math.h>
 
+#include<Preferences.h>
+
 #include<SD.h>
 
 #include<LovyanGFX.hpp>
@@ -96,7 +98,14 @@ void setup() {
 
   lcd.println(modem.localIP());
 
-   slack.postSlack(0,0);
+  Preferences prefs;
+
+  prefs.begin("location", true);
+  lat = prefs.getFloat("lat", 34.704);
+  lon = prefs.getFloat("lon", 137.734);
+  prefs.end();
+  
+   slack.postSlack(lat,lon);
 
   lcd.clear();
 
