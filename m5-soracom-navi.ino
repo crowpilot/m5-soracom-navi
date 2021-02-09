@@ -224,6 +224,9 @@ void buttonTask(void* arg) {
       //Serial.println("zoom +");
       zoom++;
     }
+    if(M5.BtnB.wasPressed()){
+      //mode set
+    }
 
     vTaskDelay(10);
   }
